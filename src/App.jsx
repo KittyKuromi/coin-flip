@@ -1,34 +1,42 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
+import { ethers } from 'hardhat';
+// import Token from './artifacts/contracts/Token.sol/Token.json'
+
+const tokenAddress = '0x2f8d6A0083EFc0E718D3b768c05AAd3be777e8C1';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [amount, setAmount] = useState(0);
+  const [flipStatus, setFlipStatus] = useState();
+
+  const requestAccount = async () => {
+    await window.ethereum.request({ method: 'eth_requestAccounts' });
+  }
+
+  const requestFlip = async (isFront) => {
+    if (amount > 0 && typeof window.ethereum !== 'undefined') {
+      const [account] = window.ethereum.request({ method: 'eth_requestAcounts' });
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const contract = new ethers.Contract(tokenAddress, Token.abi, provider);
+
+      console.log(contract.balanceOf(account))
+    }
+  }
 
   return (
-    <>
+    <div className="App">
       <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        <button type='button' onClick={requestAccount}>Connnect Wallet</button>
+        <p>{ flipStatus }</p>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
+      <div>
+        <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} />
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+      <div>
+        {/* <button type='button' onClick={() => requestFlip(true)}>Front</button>
+        <button type='button' onClick={() => requestFlip(false)}>Back</button> */}
+      </div>
+    </div>
   )
 }
 
